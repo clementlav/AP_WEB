@@ -9,6 +9,17 @@ require_once 'configs/chemins.class.php';
 require_once Chemins::CONFIGS . 'mysql_config.class.php';
 require_once Chemins::MODELES . 'GestionBoutique.class.php';
 require_once Chemins::CONFIGS . 'variables_globales.class.php';
+
+// Réponse JSON autonome : ne pas afficher l'entête HTML du site.
+if (isset($_REQUEST['controleur'], $_REQUEST['action'])
+    && $_REQUEST['controleur'] === 'Utilisateur'
+    && $_REQUEST['action'] === 'rechercherPseudo') {
+    require_once Chemins::CONTROLEURS . 'ControleurUtilisateur.class.php';
+    $objetControleur = new ControleurUtilisateur();
+    $objetControleur->rechercherPseudo();
+    exit;
+}
+
 require Chemins::VUES_PERMANENTES . 'v_entete.inc.php';
 
 require_once Chemins::CONTROLEURS . 'ControleurCategories.class.php';

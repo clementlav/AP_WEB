@@ -230,15 +230,15 @@ class GestionBoutique extends ModelePDO
     }
 
     /**
-     * Vérifie les identifiants d'un utilisateur du site.
+     * Vérifie les identifiants d'un client du site.
      */
     public static function isUserOK($login, $passe)
     {
         $pdo = self::seConnecter();
 
-        $requete = "SELECT id, login, passe, nom, role FROM User WHERE login = :login LIMIT 1";
+        $requete = "SELECT id, pseudo, passe, nom, prenom FROM client WHERE pseudo = :pseudo LIMIT 1";
         $pdoStatement = $pdo->prepare($requete);
-        $pdoStatement->bindValue('login', $login);
+        $pdoStatement->bindValue('pseudo', $login);
         $pdoStatement->execute();
         $utilisateur = $pdoStatement->fetch(PDO::FETCH_OBJ);
 
@@ -254,9 +254,15 @@ class GestionBoutique extends ModelePDO
             $motDePasseValide = password_verify($passe, $utilisateur->passe);
         }
 
-        unset($utilisateur->passe);
+        if (!$motDePasseValide) {
+            return false;
+        }
 
-        return $motDePasseValide ? $utilisateur : false;
+        $utilisateur->login = $utilisateur->pseudo;
+        $utilisateur->nom = trim($utilisateur->prenom . ' ' . $utilisateur->nom);
+        unset($utilisateur->pseudo, $utilisateur->passe, $utilisateur->prenom);
+
+        return $utilisateur;
     }
 
     /**
@@ -271,7 +277,7 @@ class GestionBoutique extends ModelePDO
             return array();
         }
 
-        self::$requete = "SELECT login FROM User WHERE login LIKE :terme ORDER BY login ASC LIMIT :limite";
+        self::$requete = "SELECT pseudo FROM client WHERE pseudo LIKE :terme ORDER BY pseudo ASC LIMIT :limite";
         self::$pdoStResults = $pdo->prepare(self::$requete);
         self::$pdoStResults->bindValue('terme', $terme . '%');
         self::$pdoStResults->bindValue('limite', (int) $limite, PDO::PARAM_INT);
