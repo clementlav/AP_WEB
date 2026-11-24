@@ -1,0 +1,1 @@
+<!-- Catégories affichées désormais dans le header - section centrale supprimée -->
